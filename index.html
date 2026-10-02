@@ -253,27 +253,171 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   version here.
 </div>
 
-<h2>Housing</h2>
+<h2>The housing</h2>
 
-<div class="todo">
-  <strong>Workshop 3 (Project 3b).</strong> The housing holds the two boards as a sandwich — the
-  panel is the face, the main board's rear edge is the back. Renders, the CAD export and photos
-  go here. Deadline Fri 9 Oct, 2 pm.
+<p>
+  The two boards sit 11 mm apart, joined by three 2&times;20 pin headers: the panel is the face,
+  the main board is under it, and the dev board hangs 17 mm below that. The housing is written in
+  OpenSCAD, and <strong>every dimension came from the board meshes, not from a ruler</strong> — the
+  numbers below are measurements, not estimates.
+</p>
+
+<figure>
+  <img src="images/housing-boards.png" alt="The two boards sitting in the printed base">
+  <figcaption>Both boards in the printed base. The panel's downward pins meet the main board's
+  upward sockets; 98&nbsp;% of them land inside, which is how the mating was checked.</figcaption>
+</figure>
+
+<h3>The problem the cover has to solve</h3>
+
+<p>
+  A cover that rests flat on the tallest thing does not work here, and the reason is worth stating
+  precisely:
+</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Part</th><th>Height above the panel face</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>TX coil terminal</td><td>14.10 mm</td></tr>
+    <tr><td>OLED module</td><td>13.82 mm</td></tr>
+    <tr><td>SMA jack</td><td>9.8 mm</td></tr>
+  </tbody>
+</table>
 </div>
 
-<h2>Firmware and app</h2>
+<p>
+  A plate sitting on the OLED leaves every SMA thread about <strong>4 mm below the surface</strong>,
+  and a plug nut cannot reach a thread it cannot touch. Measuring the panel mesh showed that the
+  OLED and the TX terminal are the <em>only</em> two things taller than the SMA threads, and that
+  both sit at y&nbsp;&lt;&nbsp;&minus;70 while the entire SMA field sits at y&nbsp;&gt;&nbsp;&minus;70.
+  So the cover splits there: a low deck over the jacks, a raised box over the other end. A thread
+  now stands <strong>5.5 mm proud</strong> of the low deck.
+</p>
+
+<figure>
+  <img src="images/housing-cover.png" alt="The cover from above, with every connector name engraved">
+  <figcaption>The cover hides the panel's silkscreen, so the names are engraved into it. They were
+  read from the master board, not from my own section copy — three of the sixteen jacks had been
+  reassigned after the sections were split, and labels taken from my copy would have been wrong.</figcaption>
+</figure>
+
+<h3>Making it print without supports</h3>
+
+<p>
+  Every wire entry is a slot in a vertical wall, so every one of them has a ceiling — a flat 90&deg;
+  overhang the slicer wants to prop up. Each one is now a 45&deg; gable, and each ventilation slot is
+  a stadium whose half-round top is horizontal only at its apex:
+</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Opening</th><th>Width</th><th>Flat ceiling left</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>USB-C</td><td>15.0 mm</td><td>0</td></tr>
+    <tr><td>DC jack</td><td>15.8 mm</td><td>0</td></tr>
+    <tr><td>Terminals &times;3</td><td>11.3–19.9 mm</td><td>0</td></tr>
+    <tr><td>Vents &times;24</td><td>3.0 mm</td><td>0</td></tr>
+    <tr><td>Nut pockets &times;4</td><td>5.8 mm</td><td>5.8 mm bridge</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  The three terminal openings were one 51.5 mm slot with a 31.4 mm bridge across it, because
+  splitting them left ribs of 0.7 and 1.4 mm — under the 2 mm wall rule and certain to snap. At
+  0.35 mm clearance, which is the brief's own figure for a hole, the ribs come out at 2.00 and
+  2.70 mm and each opening is then narrow enough for a full gable. Both problems fall out at once.
+  The four nut pockets are the only overhang left in the design.
+</p>
+
+<figure>
+  <img src="images/housing-base.png" alt="The base, showing the gabled connector openings and the ventilation slots">
+  <figcaption>The base: five gabled connector openings, 24 stadium vents, and a boss at each M3
+  mounting hole with a side-entry nut pocket.</figcaption>
+</figure>
+
+<h3>Two things the measuring turned up</h3>
+
+<p>
+  Reading dimensions off the meshes rather than trusting the drawings found two errors that would
+  otherwise have reached the printer. The published model of the main board carries a
+  <strong>stale footprint</strong>: two KF301 terminals read 5 mm high, because the fix to that
+  footprint was exported for the panel only. And my own cover was
+  <strong>190&nbsp;&times;&nbsp;106 against a 190&nbsp;&times;&nbsp;110 base</strong> — x had been
+  taken from the outer wall face and y from the inner — which the exported outline caught.
+</p>
 
 <div class="todo">
-  <strong>Workshop 3.</strong> Section A's driver and phone panel: <code>read_all</code>,
-  <code>set_range</code>, then capturing I and Q and turning them into the spectrum. This grows
-  out of <a href="https://renqian03.github.io/glowmeter/">Glowmeter</a>, the phone app from
-  Project 2.
+  <strong>To write.</strong> One or two sentences on what you would do differently, and a photo of
+  the printed parts. <strong>Nothing has been printed yet:</strong> until the test coupon comes out
+  and a real M3 goes through it, the hole sizes are assumptions.
+</div>
+
+<h2>The instrument</h2>
+
+<p>
+  The board is the shared platform; the instrument is what you make it do. Mine follows from the
+  analog section: a monitor that watches one input and decides when something has gone wrong.
+</p>
+
+<p>
+  The obvious way to do that is a threshold on the raw voltage, and it does not work. A real analog
+  input is noisy, so a rule like <em>alarm when AI3 goes above 1.5 V</em> crosses its threshold
+  dozens of times a second and fires on the first noise peak rather than on the thing you care
+  about. So the <code>watch</code> block holds one channel over a window and publishes values that
+  are worth alarming on instead:
+</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Value</th><th>What it catches</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>dev</code></td><td>How far the <em>mean</em> has moved from the baseline. Noise
+      averages out of it, so a rule fires when the signal has actually moved.</td></tr>
+    <tr><td><code>drift</code></td><td>Volts per minute. Catches a slow walk long before
+      <code>dev</code> crosses anything.</td></tr>
+    <tr><td><code>rms</code></td><td>The noise itself — so a rule here watches the instrument's
+      <em>health</em>, not its reading. An intermittent connector shows up here first.</td></tr>
+    <tr><td><code>excursions</code></td><td>Samples past <em>k</em>&sigma;, counted cumulatively,
+      so a burst of spikes that the mean hides still fires once and stays flagged.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Commands are <code>set_input</code>, <code>set_window</code>, <code>set_sigma</code>,
+  <code>zero</code> and <code>reset</code>. <code>zero</code> takes the current <em>mean</em> rather
+  than the current sample, because one noisy sample would put the baseline in the wrong place. The
+  block reads the ADS8688 through the shared driver rather than calling the inputs block, since a
+  block never talks to another block directly, and it never waits for the SPI bus — during an NMR
+  capture the sequencer holds it for the whole burst, and waiting there would stall everything else.
+</p>
+
+<p>
+  The phone panel offers the alarm as a chooser — pick the value, the operator and the threshold —
+  rather than as a fixed button, because which of those four matters depends entirely on what is
+  plugged into the input.
+</p>
+
+<div class="todo">
+  <strong>To write.</strong> A screenshot of the panel with one value on the live chart, and what
+  happened when your alarm rule fired. The firmware builds for both the simulator and the real
+  board but has <strong>not been flashed to hardware yet</strong>.
 </div>
 
 <h2>Links</h2>
 
 <div class="links">
   <a class="btn primary" href="https://github.com/Renqian03/nmr-console-section-a">This repository</a>
+  <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026/tree/a-renqian/docs/students/renqian/housing">Housing source</a>
+  <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026/tree/a-renqian/firmware/src/blocks/watch">Instrument source</a>
   <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026">Class board repository</a>
   <a class="btn" href="https://tigp-experimental-methods.github.io/showcase-2026/">Class project wall</a>
 </div>
