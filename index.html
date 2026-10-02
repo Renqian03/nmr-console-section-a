@@ -412,6 +412,76 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   board but has <strong>not been flashed to hardware yet</strong>.
 </div>
 
+<h2>Download and print it</h2>
+
+<p>
+  Everything printable, as it stands. <strong>Print the coupon first</strong> &mdash; it is small,
+  and which of its seven holes takes an M3 is the number that decides every hole in the other two
+  parts. Until it comes out, the hole sizes here are assumptions.
+</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>File</th><th>What</th><th>How to print it</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="files/coupon.stl">coupon.stl</a></td>
+      <td>Fit test &mdash; holes 3.0&ndash;3.6 mm, a nut pocket, engraved text at three sizes</td>
+      <td>62 &times; 26 &times; 10 mm. Minutes. <strong>Do this one first.</strong></td>
+    </tr>
+    <tr>
+      <td><a href="files/base.stl">base.stl</a></td>
+      <td>The tray: four M3 bosses, five connector openings, 24 vents</td>
+      <td>190 &times; 110 &times; 31 mm, flat on its back, no supports</td>
+    </tr>
+    <tr>
+      <td><a href="files/cover.stl">cover.stl</a></td>
+      <td>Two heights, with every jack name engraved</td>
+      <td>190 &times; 110 &times; 17 mm, lip down, no supports</td>
+    </tr>
+    <tr>
+      <td><a href="files/coil-former.stl">coil-former.stl</a></td>
+      <td>Receive coil former, 546 turns of 0.4 mm wire in the window</td>
+      <td>Plain PLA or PETG &mdash; <strong>never</strong> carbon-filled, it conducts</td>
+    </tr>
+    <tr>
+      <td><a href="files/cover.dxf">cover.dxf</a></td>
+      <td>Flat outline of the cover</td>
+      <td>Reference only &mdash; see the note below</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Source: <a href="files/housing.scad">housing.scad</a> is the entry point and takes
+  <code>PART = "base" | "cover" | "coupon" | "cover2d"</code>; it needs the five files beside it
+  (<a href="files/housing-params.scad">params</a>,
+  <a href="files/housing-shapes.scad">shapes</a>,
+  <a href="files/housing-base.scad">base</a>,
+  <a href="files/housing-cover.scad">cover</a>,
+  <a href="files/housing-coupon.scad">coupon</a>) and
+  <a href="https://github.com/BelfrySCAD/BOSL2">BOSL2</a>. The coil former is
+  <a href="files/coil-former.scad">coil-former.scad</a>, which prints its own winding
+  recipe and the inductance that window should give.
+</p>
+
+<p>
+  <strong>You will need two screw lengths, not one.</strong> The near pair's heads land on the low
+  deck and the far pair's on the raised deck, 12.3 mm higher: <strong>M3&nbsp;&times;&nbsp;30</strong>
+  &times;2 and <strong>M3&nbsp;&times;&nbsp;45</strong> &times;2, plus the brief's M3&nbsp;&times;&nbsp;11
+  stand-offs and four M3 nuts.
+</p>
+
+<p>
+  About the DXF: the cover is a printed part with two heights and a flat projection cannot carry
+  that. Three of its four far-wall notches do not appear in the outline at all, because the raised
+  deck above them fills their shadow. There is no <code>$INSUNITS</code> in it either, so anything
+  reading it has to be told these are millimetres. It is there for reference, not for cutting.
+</p>
+
 <h2>Links</h2>
 
 <div class="links">
