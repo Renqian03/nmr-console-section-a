@@ -115,6 +115,10 @@
   figure { margin: 0 0 22px; }
   figure img { width: 100%; border: 1px solid var(--rule); border-radius: 10px; display: block; background: var(--panel); }
   figcaption { font-size: 13.5px; color: var(--ink-faint); margin-top: 9px; }
+  /* Phone screenshots: tall, so two side by side, one per row on a narrow screen. */
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 0 0 22px; }
+  .shots figure { margin: 0; }
+  .shots img { max-width: 340px; margin: 0 auto; }
   .placeholder {
     aspect-ratio: 16 / 9; max-width: 100%;
     border: 1px dashed var(--rule); border-radius: 10px; background: var(--panel);
@@ -444,8 +448,87 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 
 <div class="todo">
   <strong>To write.</strong> A screenshot of the panel with one value on the live chart, and what
-  happened when your alarm rule fired. The firmware builds for both the simulator and the real
-  board but has <strong>not been flashed to hardware yet</strong>.
+  happened when your alarm rule fired.
+</div>
+
+<h3>A two-channel scope on the phone</h3>
+
+<div class="todo">
+  <strong>To write.</strong> In your own words: what the scope does (roll, auto, normal, single),
+  why the board sends <em>samples</em> and the phone draws them, and what the second input and the
+  spectrum let you see that the 20 Hz voltmeter cannot. One paragraph is enough.
+</div>
+
+<div class="shots">
+  <figure>
+    <img src="images/scope-two-inputs.jpg" alt="Phone scope: AI3 in blue and AI6 in green, AI6 smaller and lagging, with the measurements underneath">
+    <figcaption>AI3 and AI6 captured in the same ADC scans. AI6 is AI3 through a simulated
+      1 kHz RC low-pass.</figcaption>
+  </figure>
+  <figure>
+    <img src="images/scope-spectrum.jpg" alt="Phone spectrum of AI3: a tall line at 1 kHz and a small one at 60 Hz above a noise floor near −75 dBV">
+    <figcaption>The spectrum of AI3: the 1 kHz signal and a small 60 Hz line.</figcaption>
+  </figure>
+</div>
+
+<p>Measured on the dev board running the simulation build (the inputs are simulated until the class
+  board arrives):</p>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Quantity</th><th>Expected</th><th>Measured</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>AI6 relative to AI3 at 1 kHz (an RC low-pass at its corner)</td><td>−45° · −3.01 dB</td><td>−45.0° · −3.01 dB</td></tr>
+    <tr><td>AI3 frequency</td><td>1.000 kHz</td><td>1.000 kHz</td></tr>
+    <tr><td>AI3, a sine of 2 V amplitude</td><td>+3.0 dBV</td><td>+3.1 dBV</td></tr>
+    <tr><td>The 60 Hz line, 20 mV amplitude</td><td>−37.0 dBV</td><td>−36.9 dBV</td></tr>
+    <tr><td>AI6 peak to peak, 2/√2 V amplitude</td><td>2.83 V</td><td>2.837 V</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="todo">
+  <strong>To write.</strong> What these numbers tell you, and the one you will measure on the real
+  board: the noise floor of a shorted input in LSB rms (4000 samples in Auto). Expected, then
+  measured, once the board is here.
+</div>
+
+<h3>Talking to it from Telegram</h3>
+
+<div class="todo">
+  <strong>To write.</strong> In your own words: what you can do from Telegram, why the board can
+  reach Telegram from a phone hotspot without a server of its own, how pairing keeps strangers out,
+  and the curly-apostrophe problem that stopped the board joining the iPhone hotspot.
+</div>
+
+<div class="shots">
+  <figure>
+    <img src="images/telegram-chat.jpg" alt="Telegram chat with the instrument bot: the command list, then replies to /read, /status and /led blue">
+    <figcaption>The bot answering <code>/read</code>, <code>/status</code> and
+      <code>/led blue</code>.</figcaption>
+  </figure>
+  <figure>
+    <img src="images/telegram-panel.jpg" alt="The instrument's Telegram tab: online, paired, and the list of commands">
+    <figcaption>The instrument's Telegram tab once paired.</figcaption>
+  </figure>
+</div>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Send</th><th>The instrument</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>/status</code></td><td>uptime, WiFi, its address, board temperature, scope state, alarm rules</td></tr>
+    <tr><td><code>/read</code> · <code>/read AI3</code></td><td>all eight inputs, or one, with their ranges</td></tr>
+    <tr><td><code>/module 1 on</code></td><td>switches a module output (<code>off</code> too)</td></tr>
+    <tr><td><code>/led blue</code></td><td>the RGB LED: red, green, blue, white, off</td></tr>
+    <tr><td><code>/alarm ai1 &gt; 3.5</code></td><td>adds an alarm rule that messages this chat when it fires</td></tr>
+    <tr><td><code>/alarms</code> · <code>/unalarm 2</code> · <code>/unpair</code></td><td>lists the rules, deletes one, forgets the chat</td></tr>
+  </tbody>
+</table>
 </div>
 
 <h2>Download and print it</h2>
@@ -540,6 +623,8 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   <a class="btn primary" href="https://github.com/Renqian03/nmr-console-section-a">This repository</a>
   <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026/tree/a-renqian/docs/students/renqian/housing">Housing source</a>
   <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026/tree/a-renqian/firmware/src/blocks/watch">Instrument source</a>
+  <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026/pull/5">Scope (PR #5)</a>
+  <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026/pull/6">Telegram (PR #6)</a>
   <a class="btn" href="https://github.com/TIGP-Experimental-Methods/class-board-2026">Class board repository</a>
   <a class="btn" href="https://tigp-experimental-methods.github.io/showcase-2026/">Class project wall</a>
 </div>
