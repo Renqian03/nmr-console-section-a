@@ -1,18 +1,31 @@
 // Housing - Ren Qian (Section A), 2026-10-02.
+// Version 2, 2026-10-08, from SPEC.md: no vents, white names front and back,
+// pole marks on the rear wall, and my name on the cover.
 // This is the entry point. Set PART, press F5, export with F6.
 //
-//   PART = "base"     the tray: wall, floor, four M3 bosses with nut pockets,
-//                     five rear connector openings, ventilation slots
-//   PART = "cover"    two heights - a low deck over the SMA field so the threads
-//                     come through, a raised box over the OLED / TX terminal end
-//   PART = "coupon"   the fit test. PRINT THIS ONE FIRST
-//   PART = "cover2d"  flat outline of the cover, for cover.dxf
+//   PART = "base"        the tray: wall, floor, four M3 bosses with nut pockets,
+//                        the rear connector openings              -> base.stl
+//   PART = "base_labels" the pole marks on the rear wall as a separate part
+//                        for white; load with base.stl as one object
+//                                                             -> base-labels.stl
+//   PART = "cover_low"   the cover's low deck over the SMA field     -> cover-low.stl
+//   PART = "cover_high"  the cover's raised box over the OLED end    -> cover-high.stl
+//   PART = "cover_low_labels", "cover_high_labels"
+//                        the names as a separate part for a second colour, to be
+//                        loaded together with their half as one object
+//                                       -> cover-low-labels.stl, cover-high-labels.stl
+//                        Both come out FACE DOWN, ready for the plate. The cover
+//                        has two heights 12.3 mm apart and cannot print as one
+//                        part without supports - see the split in housing-cover.
+//   PART = "cover"       the whole cover in place, for looking at only
+//   PART = "coupon"      the fit test. PRINT THIS ONE FIRST
+//   PART = "cover2d"     flat outline of the whole cover, for cover.dxf
 //
 // The work is split across four more files, each of which opens on its own:
 //   housing-params.scad   every number, and which of them are measured facts
-//   housing-shapes.scad   the two opening shapes, and where the vents go
-//   housing-base.scad     module base()
-//   housing-cover.scad    module cover()
+//   housing-shapes.scad   the wire-entry shape
+//   housing-base.scad     base(), and its pole-mark inlay
+//   housing-cover.scad    cover(), and its two printed halves
 //   housing-coupon.scad   module coupon()
 //
 // About cover.dxf: it is the flat outline of the cover, and it cannot be more
@@ -26,7 +39,7 @@
 // NOT DONE: nothing has been printed. Until coupon.stl is printed and measured,
 // M3_CLEAR, NUT_AF and FIT are assumptions, not results.
 
-PART = "base";          // "base" | "cover" | "coupon" | "cover2d"
+PART = "base";  // [base, base_labels, cover_low, cover_high, cover_low_labels, cover_high_labels, cover, coupon, cover2d, assembly]
 
 include <BOSL2/std.scad>
 include <housing-params.scad>
@@ -35,10 +48,41 @@ include <housing-base.scad>
 include <housing-cover.scad>
 include <housing-coupon.scad>
 
-if (PART == "base")    base();
-if (PART == "cover")   cover();
+if (PART == "base")       base();
+if (PART == "base_labels") base_labels();
+if (PART == "cover_low")  cover_low();
+if (PART == "cover_high") cover_high();
+if (PART == "cover_low_labels")  cover_low_labels();
+if (PART == "cover_high_labels") cover_high_labels();
+if (PART == "cover")      cover();
 if (PART == "coupon")  coupon();
 if (PART == "cover2d") projection(cut = false) cover();
+
+// Everything in place for housing.png: the boards where they really sit, and the
+// two cover halves lifted and pulled apart so the split shows. Preview only (F5);
+// the colours do not survive F6.
+// It draws the EXPORTED STL files, not the modules - so export first. Two
+// reasons: the picture is then of exactly the files handed in, and the label
+// inlays (a cover minus a cover, inside an intersection) are more CSG than the
+// preview can draw - it gave up and painted the whole cover white and lost the
+// base walls. face_down() undoes itself, so it turns the face-down halves back.
+EXPLODE_Z = 28;
+EXPLODE_Y = 10;
+if (PART == "assembly") {
+  color("Teal")          import("base.stl");
+  color("White")         import("base-labels.stl");
+  color("ForestGreen")   import("../../../../hardware/release/front-panel.stl");
+  color("DarkGreen")     translate([180, 0, -BOARD_GAP]) rotate([0, 180, 0])
+                           import("../../../../hardware/release/class-board.stl");
+  translate([0, 0, EXPLODE_Z]) face_down(LOW_TOP) {
+    color("SteelBlue")      import("cover-low.stl");
+    color("White")          import("cover-low-labels.stl");
+  }
+  translate([0, -EXPLODE_Y, EXPLODE_Z]) face_down(HIGH_TOP) {
+    color("LightSteelBlue") import("cover-high.stl");
+    color("White")          import("cover-high-labels.stl");
+  }
+}
 
 // ---- check the numbers -------------------------------------------------------
 echo(str("PART = ", PART));
@@ -46,6 +90,10 @@ echo(str("base   outer ", OSIZE.x, " x ", OSIZE.y, " x ", COVER_SIT-FLOOR_BOT,
          "   bed 256: ", (OSIZE.x<=256 && OSIZE.y<=256) ? "ok" : "NO"));
 echo(str("cover  sits at z ", COVER_SIT, "  low deck top ", LOW_TOP,
          "  raised top ", HIGH_TOP));
+echo(str("cover  split at y ", SPLIT_Y, " with a ", FIT, " mm gap:  low ",
+         OSIZE.x, " x ", OUT_Y1 - SPLIT_Y - FIT, " x ", LOW_TOP - (COVER_SIT - LIP_H),
+         "   high ", OSIZE.x, " x ", SPLIT_Y - OUT_Y0, " x ", HIGH_TOP - (COVER_SIT - LIP_H),
+         "   both printed face down"));
 echo(str("SMA thread proud of the low deck: ", SMA_TOP - LOW_TOP, " mm"));
 echo(str("raised deck inner z ", HIGH_IN, " clears TX terminal ", TXT[2],
          " by ", HIGH_IN - TXT[2]));
@@ -68,4 +116,39 @@ for (c = FAR_SIDE) {
   echo(str("   cover ", c[0], "  width ", w, " -> ",
            r < 0 ? "runs out through the top edge, no ceiling" : str("flat ", w - 2*r)));
 }
-echo(str("   vents  stadium ", VENT_W, " mm wide, no ceiling at all"));
+echo("   vents  none - version 2, SPEC.md decision 1");
+echo(str("pole marks at z ", POLE_Z, ", in the band ", FLOOR_BOT, " .. ", POLE_TOP,
+         " (", POLE_TOP - FLOOR_BOT, " mm for ", POLE_SIZE, " text)"));
+
+// The DC jack and the USB-C sit 5.0 mm apart (152.5 -> 157.5). Negative here
+// means the two openings merge into one, which they do. See REAR in
+// housing-params.scad for why that is the right answer.
+RIB_DC_USB = 5.0 - PAD_USB - PAD_DC;
+echo(str("   DC/USB rib ", RIB_DC_USB, " mm -> ",
+         RIB_DC_USB <= 0 ? "merged: 5 connectors, 4 openings"
+                         : "separate, 5 openings"));
+
+// ---- printing ----------------------------------------------------------------
+// Measured on the version 2 STLs, not estimated. Nothing needs support:
+//   base        bottom face on the plate. The only flat ceilings left are the
+//               tops of the pole-mark grooves, 0.6 mm deep and 7 mm2 in all, and
+//               with the white part loaded they are filled. Nut pockets roofed
+//               at 49 degrees, wire entries gabled at 45, no vents.
+//   cover-low, cover-high
+//               face down, as exported. Apart from the bed face, only the floors
+//               of the name grooves - which the white parts fill.
+//   bed       190 x 110 - fits 256 x 256; does NOT fit an A1 mini (180 x 180)
+//   PLA       base 102 g, cover-low 28.6 g, cover-high 35.5 g; white 0.4 g
+//   walls     set wall loops to 4 or more. Every wall here is 2.0 mm, which at
+//             0.42 mm line width is 4.8 lines; at the default 2 loops the middle
+//             of every wall is infill, including the 2.00 mm rib between the
+//             J903 and J905 terminal openings.
+//   infill    25%. The four bosses are the only bulk and they carry the screws.
+//   brim      yes. 190 mm of 2 mm floor is a corner-lift shape.
+//   support   none.
+//   colour    load each part together with its -labels.stl and answer Yes to
+//             "load as a single object with multiple parts"; the labels part is
+//             white, the body a dark colour so the white reads. The covers'
+//             names are the first 3 layers; the base's marks are on an upright
+//             wall and span about 16 - SPEC.md decision 4 accepts the swaps.
+//             No AMS: print the bodies alone and every name is still engraved.

@@ -268,6 +268,39 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   upward sockets; 98&nbsp;% of them land inside, which is how the mating was checked.</figcaption>
 </figure>
 
+<h3>Version 2: fewer holes</h3>
+
+<p>
+  The first housing had too many holes, so I rebuilt it from my own specification, written by
+  answering one question at a time &mdash; <a href="files/SPEC.md">SPEC.md</a> has every decision
+  and the reason for it. What changed:
+</p>
+
+<ul>
+  <li><strong>No vents.</strong> Version 1 had 24 slots in three walls; now the walls are clean.
+    What gets warm inside &mdash; the 3.3 V regulator, the isolated supplies, the NMR power
+    amplifier during a pulse &mdash; leaves the box somewhat above room temperature, nowhere near
+    the 60&nbsp;&deg;C at which PLA softens.</li>
+  <li><strong>The names are white.</strong> Engraved 0.6 mm and filled with a second-colour inlay,
+    so they can be read across a bench.</li>
+  <li><strong>The back is labelled.</strong> Each rear connector's name runs along the cover's rear
+    edge, and each terminal's poles are marked in the rear wall under its wire entries:
+    J901 <code>+ &minus;</code>, J903 <code>1 2</code> &mdash; an H-bridge output has no fixed
+    polarity, so <code>+ &minus;</code> would be wrong &mdash; and J905 <code>+ C &minus;</code>.
+    All of it was read from the board file's pad nets and silkscreen.</li>
+  <li><strong>The cover is two parts.</strong> Its two flat tops are 12.3 mm apart and only one can
+    lie on the bed: printed in one piece, 10&nbsp;658&nbsp;mm&sup2; of deck hung 12.3 mm in mid-air.
+    Split where the height already changes, each half prints face down with no supports and keeps
+    two of the four screws.</li>
+</ul>
+
+<figure>
+  <img src="images/housing-exploded.png" alt="The housing exploded: base, both boards, and the two cover halves lifted apart">
+  <figcaption>Version 2, exploded: the base, both boards where they really sit, and the two cover
+  halves lifted and pulled apart at the split. A clash test checks every point of both board
+  meshes against every part: nothing is inside.</figcaption>
+</figure>
+
 <h3>The problem the cover has to solve</h3>
 
 <p>
@@ -298,8 +331,9 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 </p>
 
 <figure>
-  <img src="images/housing-cover.png" alt="The cover from above, with every connector name engraved">
-  <figcaption>The cover hides the panel's silkscreen, so the names are engraved into it. They were
+  <img src="images/housing-cover.png" alt="The two cover halves from above, every connector name in white">
+  <figcaption>The cover hides the panel's silkscreen, so the names are engraved into it and filled
+  with white. The SMA names were
   read from the master board, not from my own section copy — three of the sixteen jacks had been
   reassigned after the sections were split, and labels taken from my copy would have been wrong.</figcaption>
 </figure>
@@ -308,8 +342,8 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 
 <p>
   Every wire entry is a slot in a vertical wall, so every one of them has a ceiling — a flat 90&deg;
-  overhang the slicer wants to prop up. Each one is now a 45&deg; gable, and each ventilation slot is
-  a stadium whose half-round top is horizontal only at its apex:
+  overhang the slicer wants to prop up. Each one is now a 45&deg; gable, and each nut pocket has a
+  49&deg; roof:
 </p>
 
 <div class="tablewrap">
@@ -321,8 +355,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
     <tr><td>USB-C</td><td>15.0 mm</td><td>0</td></tr>
     <tr><td>DC jack</td><td>15.8 mm</td><td>0</td></tr>
     <tr><td>Terminals &times;3</td><td>11.3–19.9 mm</td><td>0</td></tr>
-    <tr><td>Vents &times;24</td><td>3.0 mm</td><td>0</td></tr>
-    <tr><td>Nut pockets &times;4</td><td>5.8 mm</td><td>5.8 mm bridge</td></tr>
+    <tr><td>Nut pockets &times;4</td><td>5.8 mm</td><td>0</td></tr>
   </tbody>
 </table>
 </div>
@@ -332,13 +365,16 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   splitting them left ribs of 0.7 and 1.4 mm — under the 2 mm wall rule and certain to snap. At
   0.35 mm clearance, which is the brief's own figure for a hole, the ribs come out at 2.00 and
   2.70 mm and each opening is then narrow enough for a full gable. Both problems fall out at once.
-  The four nut pockets are the only overhang left in the design.
+  With the nut pockets roofed, the base has no flat ceiling left anywhere; the only thing a slicer
+  would still call an overhang is the 0.6 mm top of each pole-mark groove, and the white part fills
+  those.
 </p>
 
 <figure>
-  <img src="images/housing-base.png" alt="The base, showing the gabled connector openings and the ventilation slots">
-  <figcaption>The base: five gabled connector openings, 24 stadium vents, and a boss at each M3
-  mounting hole with a side-entry nut pocket.</figcaption>
+  <img src="images/housing-base.png" alt="The base from behind: four gabled connector openings and the pole marks under the terminals">
+  <figcaption>The base from behind: four gabled openings for five connectors, the pole marks under
+  each terminal, and no vents. The DC jack and the USB-C share an opening on purpose &mdash; they
+  sit 5 mm apart, so any rib between them would be under the 2 mm wall rule.</figcaption>
 </figure>
 
 <h3>Two things the measuring turned up</h3>
@@ -416,7 +452,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 
 <p>
   Everything printable, as it stands. <strong>Print the coupon first</strong> &mdash; it is small,
-  and which of its seven holes takes an M3 is the number that decides every hole in the other two
+  and which of its seven holes takes an M3 is the number that decides every hole in the other
   parts. Until it comes out, the hole sizes here are assumptions.
 </p>
 
@@ -432,14 +468,19 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
       <td>62 &times; 26 &times; 10 mm. Minutes. <strong>Do this one first.</strong></td>
     </tr>
     <tr>
-      <td><a href="files/base.stl">base.stl</a></td>
-      <td>The tray: four M3 bosses, five connector openings, 24 vents</td>
+      <td><a href="files/base.stl">base.stl</a><br>+ <a href="files/base-labels.stl">base-labels.stl</a></td>
+      <td>The tray: four M3 bosses, four openings for five connectors, the pole marks</td>
       <td>190 &times; 110 &times; 31 mm, flat on its back, no supports</td>
     </tr>
     <tr>
-      <td><a href="files/cover.stl">cover.stl</a></td>
-      <td>Two heights, with every jack name engraved</td>
-      <td>190 &times; 110 &times; 17 mm, lip down, no supports</td>
+      <td><a href="files/cover-low.stl">cover-low.stl</a><br>+ <a href="files/cover-low-labels.stl">cover-low-labels.stl</a></td>
+      <td>The low deck over the SMA field: the 16 jack names, the rear connectors' names, my name</td>
+      <td>190 &times; 60 &times; 5 mm, already face down, no supports</td>
+    </tr>
+    <tr>
+      <td><a href="files/cover-high.stl">cover-high.stl</a><br>+ <a href="files/cover-high-labels.stl">cover-high-labels.stl</a></td>
+      <td>The raised box over the OLED and the TX terminal</td>
+      <td>190 &times; 50 &times; 17 mm, already face down, no supports</td>
     </tr>
     <tr>
       <td><a href="files/coil-former.stl">coil-former.stl</a></td>
@@ -456,8 +497,19 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 </div>
 
 <p>
+  <strong>Two colours.</strong> Load each body together with its <code>-labels</code> file and answer
+  Yes to <em>load as a single object with multiple parts</em>; give the labels part white and the
+  body a dark colour. On the covers the names are the first three layers, so the AMS changes colour
+  only a few times; the base's pole marks are on an upright wall and span about 16 layers. All the
+  white together is under half a gram. With no AMS, print the bodies alone &mdash; every name is
+  still there, engraved.
+</p>
+
+<p>
   Source: <a href="files/housing.scad">housing.scad</a> is the entry point and takes
-  <code>PART = "base" | "cover" | "coupon" | "cover2d"</code>; it needs the five files beside it
+  <code>PART</code> = <code>base</code>, <code>base_labels</code>, <code>cover_low</code>,
+  <code>cover_high</code>, <code>cover_low_labels</code>, <code>cover_high_labels</code>,
+  <code>coupon</code> or <code>cover2d</code>; it needs the five files beside it
   (<a href="files/housing-params.scad">params</a>,
   <a href="files/housing-shapes.scad">shapes</a>,
   <a href="files/housing-base.scad">base</a>,
