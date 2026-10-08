@@ -453,11 +453,25 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 
 <h3>A two-channel scope on the phone</h3>
 
-<div class="todo">
-  <strong>To write.</strong> In your own words: what the scope does (roll, auto, normal, single),
-  why the board sends <em>samples</em> and the phone draws them, and what the second input and the
-  spectrum let you see that the 20 Hz voltmeter cannot. One paragraph is enough.
-</div>
+<p>
+  The B1 tab is an oscilloscope as well as a voltmeter. The voltmeter reads all eight inputs twenty
+  times a second, which is fine for a slow drift but useless for anything in the kilohertz range: a
+  1 kHz sine read twenty times a second just looks like random numbers. So for fast signals the
+  board samples one or two inputs at up to 250&nbsp;kS/s and sends the raw samples to the phone as
+  binary frames on the same WebSocket. The phone does all the drawing, measuring and the FFT, which
+  keeps the firmware small and leaves the board free to sample.
+</p>
+
+<p>
+  <strong>Roll</strong> streams continuously, like a chart recorder. <strong>Auto</strong>,
+  <strong>Normal</strong> and <strong>Single</strong> take triggered snapshots, so a repeating
+  waveform stands still on the screen: Auto still shows something when the trigger never fires,
+  Normal waits for it, and Single takes one capture and stops. The second input is sampled in the
+  same ADC scan as the first, so the phase between the two traces is real. Here AI6 is AI3 after a
+  1&nbsp;kHz RC low-pass, and the panel reads the 45° lag directly. The spectrum view turns the same
+  samples into a frequency plot, and that is where small things show up: the 60&nbsp;Hz line sits
+  40&nbsp;dB below the 1&nbsp;kHz signal and cannot be seen on the waveform at all.
+</p>
 
 <div class="shots">
   <figure>
@@ -489,19 +503,46 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 </table>
 </div>
 
+<p>
+  Every number lands on the textbook value. An RC low-pass at its corner frequency passes a signal
+  at 1/√2 of its amplitude (−3.01&nbsp;dB) and 45° late, and a sine of amplitude <em>A</em> has an
+  rms value of <em>A</em>/√2, which for 2&nbsp;V is +3.0&nbsp;dBV. The inputs are still simulated,
+  so this checks the software chain (sampling, framing, the phone's arithmetic) and not the analog
+  front end.
+</p>
+
 <div class="todo">
-  <strong>To write.</strong> What these numbers tell you, and the one you will measure on the real
-  board: the noise floor of a shorted input in LSB rms (4000 samples in Auto). Expected, then
-  measured, once the board is here.
+  <strong>To add when the board arrives.</strong> The noise floor of one input: short the SMA,
+  capture 4000 samples in Auto, and read <em>AC RMS in LSB</em>. A good 16-bit converter on a quiet
+  board should give a few LSB rms. Expected, then measured.
 </div>
 
 <h3>Talking to it from Telegram</h3>
 
-<div class="todo">
-  <strong>To write.</strong> In your own words: what you can do from Telegram, why the board can
-  reach Telegram from a phone hotspot without a server of its own, how pairing keeps strangers out,
-  and the curly-apostrophe problem that stopped the board joining the iPhone hotspot.
-</div>
+<p>
+  The instrument also has a Telegram bot. From anywhere, I can ask it for its readings, switch a
+  module output, change its LED, or set an alarm that messages me when an input crosses a threshold.
+  This works from a phone hotspot because the board never waits for incoming connections. It keeps
+  asking Telegram's servers for new messages (long polling) and sends its replies the same way, so
+  all it needs is a way out to the internet: no server of my own and no public address. That is
+  also why I used Telegram rather than LINE, which can only deliver messages to a public web
+  address.
+</p>
+
+<p>
+  Anyone can find a bot, so the board obeys one chat only. The instrument's page shows a six-digit
+  code, and only the chat that sends <code>/start</code> with that code is paired; five wrong
+  guesses change the code. Messages sent while the board was switched off are skipped rather than
+  carried out, so an old <code>/module 1 on</code> cannot switch anything hours later.
+</p>
+
+<p>
+  The surprise was getting onto the iPhone hotspot at all. An iPhone's hotspot is named after the
+  phone, <em>Tee’s iPhone</em>, and iOS writes that apostrophe as a curly <code>’</code> (U+2019).
+  I had typed a straight <code>'</code>, so the board never matched the name and silently fell back
+  to its own network. Once the firmware printed the networks it could see, the difference showed up
+  at once. Every iPhone in the class will hit the same problem.
+</p>
 
 <div class="shots">
   <figure>
