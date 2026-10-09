@@ -652,7 +652,9 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 <p>
   Everything printable, as it stands. <strong>Print the coupon first</strong> &mdash; it is small,
   and which of its seven holes takes an M3 is the number that decides every hole in the other
-  parts. Until it comes out, the hole sizes here are assumptions.
+  parts. Its nut pocket is a corner cut out of the base itself, and its names are the cover's own
+  2.2&nbsp;mm names, printed face down in white the same way. Until it comes out, the hole sizes
+  here are assumptions.
 </p>
 
 <div class="tablewrap">
@@ -662,9 +664,9 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   </thead>
   <tbody>
     <tr>
-      <td><a href="files/coupon.stl">coupon.stl</a></td>
-      <td>Fit test &mdash; holes 3.0&ndash;3.6 mm, a nut pocket, engraved text at three sizes</td>
-      <td>62 &times; 26 &times; 10 mm. Minutes. <strong>Do this one first.</strong></td>
+      <td><a href="files/coupon.3mf">coupon.3mf</a>, or<br><a href="files/coupon.stl">coupon.stl</a><br>+ <a href="files/coupon-labels.stl">coupon-labels.stl</a></td>
+      <td>Fit test &mdash; M3 holes 3.0&ndash;3.6 mm, SMA holes 6.6&ndash;7.0 mm, a corner of the base with its nut pocket, the cover's names at 2.0, 2.2 and 2.6 mm</td>
+      <td>78 &times; 39 &times; 10 mm, names face down, about 40 min. The 3mf is already set up for two colours and Arachne. <strong>Do this one first.</strong></td>
     </tr>
     <tr>
       <td><a href="files/base.stl">base.stl</a><br>+ <a href="files/base-labels.stl">base-labels.stl</a></td>
@@ -705,10 +707,18 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 </p>
 
 <p>
+  <strong>Set the wall generator to Arachne</strong> (Quality tab) for the covers and the coupon.
+  The A1 profile starts on Classic, and sliced that way the 2.2&nbsp;mm names got white on under
+  16&nbsp;% of their letters in the first layer &mdash; the face you read &mdash; because their
+  0.44&nbsp;mm strokes are narrower than the 0.5&nbsp;mm first-layer line. With Arachne it is
+  95&ndash;97&nbsp;%. <a href="files/coupon.3mf">coupon.3mf</a> already has it set.
+</p>
+
+<p>
   Source: <a href="files/housing.scad">housing.scad</a> is the entry point and takes
   <code>PART</code> = <code>base</code>, <code>base_labels</code>, <code>cover_low</code>,
   <code>cover_high</code>, <code>cover_low_labels</code>, <code>cover_high_labels</code>,
-  <code>coupon</code> or <code>cover2d</code>; it needs the five files beside it
+  <code>coupon</code>, <code>coupon_labels</code> or <code>cover2d</code>; it needs the five files beside it
   (<a href="files/housing-params.scad">params</a>,
   <a href="files/housing-shapes.scad">shapes</a>,
   <a href="files/housing-base.scad">base</a>,
