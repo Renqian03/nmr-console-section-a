@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NMR Console — Section A</title>
 <meta name="description" content="Section A (analog) of the TIGP 2026 class board: an NMR console built by the class. Project 3, Basic Skills for Experimentalists.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NMR Console — Section A · Tee Ren Qian">
+<meta property="og:description" content="An 8-channel, 16-bit instrument you drive from your phone: a two-channel scope with a spectrum, alarms and a Telegram bot, in a housing designed to print without supports.">
+<meta property="og:url" content="https://renqian03.github.io/nmr-console-section-a/">
+<meta property="og:image" content="https://renqian03.github.io/nmr-console-section-a/images/housing-exploded.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   :root {
     --bg:        #fbfaf8;
@@ -77,6 +83,12 @@
   }
   .todo strong { color: var(--ink); }
 
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 0; }
+  .toc a { font-size: 14px; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 20px;
+    color: var(--ink-soft); text-decoration: none; background: var(--panel); }
+  .toc a:hover { border-color: var(--accent); color: var(--accent); }
+  ol.steps { margin: 0 0 16px; padding-left: 22px; max-width: 68ch; }
+  ol.steps li { margin-bottom: 10px; }
   .cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 0 0 8px; }
   .card {
     background: var(--panel); border: 1px solid var(--rule);
@@ -162,13 +174,59 @@
   </div>
 </header>
 
-<h2>What I am responsible for</h2>
+<nav class="toc" aria-label="On this page">
+  <a href="#board">The board</a><a href="#worked-out">What I worked out</a><a href="#housing">The housing</a>
+  <a href="#instrument">The instrument</a><a href="#print">Download and print</a><a href="#links">Links</a>
+</nav>
 
-<div class="todo">
-  <strong>To write.</strong> Replace this with two or three sentences in your own words: what
-  the analog section does, and why the panel is where its signals are either kept clean or
-  spoilt. Everything below is scaffolding — rewrite freely.
+<h2 id="overview">At a glance</h2>
+
+<div class="cards">
+  <div class="card">
+    <p class="k">The board</p>
+    <p class="v">13 nets</p>
+    <p class="n">The analog nets of the front panel, and 47 of 53 connections in my area of the main
+      board — no new design-rule errors.</p>
+  </div>
+  <div class="card">
+    <p class="k">The housing</p>
+    <p class="v">2-part cover</p>
+    <p class="n">Every dimension from the 3D models; prints face down with no supports; the
+      connector names in white.</p>
+  </div>
+  <div class="card">
+    <p class="k">The instrument</p>
+    <p class="v">On your phone</p>
+    <p class="n">An 8-channel, 16-bit voltmeter, a two-channel scope with a spectrum, alarms, and a
+      Telegram bot.</p>
+  </div>
 </div>
+
+<h3>How to use it</h3>
+<ol class="steps">
+  <li><strong>Power the board.</strong> It joins the WiFi named in <code>secrets.h</code> — a phone
+    hotspot works — or, if it cannot, opens its own network <code>instrument-XXXX</code> (password
+    <code>instrument</code>).</li>
+  <li><strong>Open its page in the phone's browser:</strong> <code>http://192.168.4.1/</code> on its
+    own network, or the address it prints over USB when it joined yours.</li>
+  <li><strong>B1 Inputs</strong> shows the eight voltages. Scroll to <em>Scope</em>, pick an input and
+    press <em>Run</em>; <em>Spectrum</em> shows the same samples by frequency; a second input
+    gives the phase between two signals.</li>
+  <li><strong>Telegram</strong>: paste a bot token from @BotFather, tap <em>Open in Telegram</em> and
+    press <em>Start</em>. Then <code>/read</code>, <code>/status</code>, <code>/led blue</code> or
+    <code>/alarm ai1 &gt; 9</code> — from anywhere.</li>
+</ol>
+
+<h2 id="responsible">What I am responsible for</h2>
+
+<p>
+  Section A is the analog part of the instrument: the eight inputs that measure, the two outputs
+  that drive, and the receive and transmit lines of the NMR coil. Every one of those signals
+  crosses the front panel on its way in or out, so the panel is where it is either kept clean or
+  spoilt — a trace run past a noisy digital line, or a ground return that wanders, adds noise no
+  later stage can take out. My job was to route those nets, and the analog area of the main board,
+  without letting that happen.
+</p>
 
 <p>
   The front panel is the face of the instrument and the board every signal leaves through. It is
@@ -207,7 +265,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   <span class="net">TX</span>
 </div>
 
-<h2>The board</h2>
+<h2 id="board">The board</h2>
 
 <div class="todo">
   <strong>To add.</strong> A photo of the assembled board, once it comes back from the fab.
@@ -218,7 +276,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   <figcaption>The front panel with Section A's nets routed.</figcaption>
 </figure>
 
-<h2>What I worked out</h2>
+<h2 id="worked-out">What I worked out</h2>
 
 <p>
   The design question for this section is not which amplifier has the lowest noise on its
@@ -250,14 +308,31 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   sides of the line.
 </p>
 
-<div class="todo">
-  <strong>To write.</strong> Your answers to the two section questions — why the receiver is
-  blanked between the amplifier stages rather than at its input, and why the interstage
-  high-pass corner is at 1.6 kHz and not 1.6 Hz. Both are in your working notes; put the short
-  version here.
-</div>
+<h3>Why blank the receiver between the stages, not at its input?</h3>
 
-<h2>The housing</h2>
+<p>
+  The blanking switch dumps about 60&nbsp;pC of charge every time it changes state. On the tank
+  (1.25&nbsp;nF) that is a 48&nbsp;mV kick; on the 10&nbsp;nF coupling capacitor between the stages
+  it is 6&nbsp;mV — and that point is already after the first stage's gain of 101, so referred to
+  the input it is about 59&nbsp;&micro;V, some 800 times smaller. Worse, a kick into the tank does
+  not just settle: the tank rings at 89.4&nbsp;kHz, exactly the signal's frequency, with
+  &tau; = 2Q/&omega;<sub>0</sub> &asymp; 36&nbsp;&micro;s, and no filter can tell that ringing from
+  the signal. A switch across the tank would also load and detune it on every shot.
+</p>
+
+<h3>Why is the interstage high-pass at 1.6&nbsp;kHz, not 1.6&nbsp;Hz?</h3>
+
+<p>
+  Because a coupling corner is also a recovery time. The transmit pulse drives the first stage
+  into its rails and charges the coupling capacitor, and the receiver is blind until it
+  discharges, with &tau; = 1/(2&pi;f<sub>c</sub>). At 1.6&nbsp;kHz that is 100&nbsp;&micro;s — about
+  0.1&nbsp;% of a 75&nbsp;ms free induction decay. At 1.6&nbsp;Hz it is 100&nbsp;ms, longer than the
+  whole signal: the amplifier would come back after the decay had already gone, and the board
+  would look broken rather than mistuned. The higher corner costs nothing, because the signal
+  sits at the 5.4&nbsp;kHz intermediate frequency, well above it.
+</p>
+
+<h2 id="housing">The housing</h2>
 
 <p>
   The two boards sit 11 mm apart, joined by three 2&times;20 pin headers: the panel is the face,
@@ -398,7 +473,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   and a real M3 goes through it, the hole sizes are assumptions.
 </div>
 
-<h2>The instrument</h2>
+<h2 id="instrument">The instrument</h2>
 
 <p>
   The board is the shared platform; the instrument is what you make it do. Mine follows from the
@@ -572,7 +647,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
 </table>
 </div>
 
-<h2>Download and print it</h2>
+<h2 id="print">Download and print it</h2>
 
 <p>
   Everything printable, as it stands. <strong>Print the coupon first</strong> &mdash; it is small,
@@ -658,7 +733,7 @@ line, and the two that matter most — the receiver input <code>RX</code> and th
   reading it has to be told these are millimetres. It is there for reference, not for cutting.
 </p>
 
-<h2>Links</h2>
+<h2 id="links">Links</h2>
 
 <div class="links">
   <a class="btn primary" href="https://github.com/Renqian03/nmr-console-section-a">This repository</a>
